@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Your Shopping Cart</h2>
+{% if cart_items %}
+    <div class="cart-container">
+        <ul class="cart-list">
+            {% for item in cart_items %}
+            <li class="cart-item">
+                <img src="{{ item.image_url }}" width="60">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-price">₹{{ item.price }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="cart-summary">
+            <h3>Total: ₹{{ total }}</h3>
+            <a href="/clear_cart" class="btn delete-btn">Clear Cart</a>
+            <a href="#" class="btn checkout-btn" onclick="alert('Order Placed Successfully!')">Checkout</a>
+        </div>
+    </div>
+{% else %}
+    <p class="empty-msg">Your cart is empty. <a href="/">Start shopping!</a></p>
+{% endif %}
+{% endblock %}

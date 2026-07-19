@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relational Store Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <h1>📊 Relational E-Commerce Admin Panel</h1>
+        <hr>
+
+        <!-- ================= FORMS SECTION ================= -->
+        <div class="grid-container">
+            
+            <!-- Form 1: Add Category -->
+            <div class="card-form">
+                <h3>📁 Add Category</h3>
+                <form action="/add_category" method="POST">
+                    <input type="text" name="category_name" placeholder="e.g., Electronics, Clothing" required>
+                    <button type="submit" class="btn btn-primary">Save Category</button>
+                </form>
+            </div>
+
+            <!-- Form 2: Add Product (One-to-Many & One-to-One) -->
+            <div class="card-form">
+                <h3>🏷️ Add Product & Technical Info</h3>
+                <form action="/add_product" method="POST">
+                    <input type="text" name="name" placeholder="Product Name" required>
+                    <input type="number" step="0.01" name="price" placeholder="Price" required>
+                    
+                    <label>Select Category (1-to-Many):</label>
+                    <select name="category_id" required>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <fieldset>
+                        <legend>Technical Details (1-to-1 Relationship)</legend>
+                        <input type="text" name="warranty" placeholder="Warranty (e.g., 2 Years)" required>
+                        <input type="text" name="manufacturer" placeholder="Manufacturer Company" required>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-success">Save Product</button>
+                </form>
+            </div>
+
+            <!-- Form 3: Create Order (Many-to-Many) -->
+            <div class="card-form">
+                <h3>🛒 Create Order</h3>
+                <form action="/create_order" method="POST">
+                    <input type="text" name="customer_name" placeholder="Customer Name" required>
+                    
+                    <label>Select Multiple Products (Many-to-Many):</label>
+                    <div class="checkbox-group">
+                        {% for prod in products %}
+                            <label>
+                                <input type="checkbox" name="product_ids" value="{{ prod.id }}"> 
+                                {{ prod.name }} (₹{{ prod.price }})
+                            </label><br>
+                        {% else %}
+                            <p style="color:red;">No products available to order.</p>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-orange">Place Multi-Product Order</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= DATA DISPLAY SECTION ================= -->
+        <h2 class="section-title">📦 Live Database Records & Linkage</h2>
+
+        <div class="tables-wrapper">
+            <!-- Table 1: Categories and their products (One-to-Many Visualization) -->
+            <div class="table-section">
+                <h3>Categories & Products Inside Them</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Associated Products (Count)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cat in categories %}
+                        <tr>
+                            <td><strong>{{ cat.name }}</strong></td>
+                            <td>
+                                <ul>
+                                {% for prod in cat.products %}
+                                    <li>{{ prod.name }} (₹{{ prod.price }})</li>
+                                {% else %}
+                                    <li class="empty-text">Empty Category</li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table 2: Products Full Info (One-to-One Visualization) -->
+            <div class="table-section">
+                <h3>Products & 1-to-1 Technical Specs</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Warranty (1:1)</th>
+                            <th>Manufacturer (1:1)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in products %}
+                        <tr>
+                            <td>{{ prod.name }}</td>
+                            <td><span class="badge">{{ prod.category.name }}</span></td>
+                            <td>₹{{ prod.price }}</td>
+                            <td>{{ prod.technical_detail.warranty }}</td>
+                            <td>{{ prod.technical_detail.manufacturer }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table 3: Orders (Many-to-Many Visualization) -->
+            <div class="table-section">
+                <h3>Orders Placed (Many-to-Many mapping)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>OrderID</th>
+                            <th>Customer Name</th>
+                            <th>Products Included</th>
+                            <th>Items Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ord in orders %}
+                        <tr>
+                            <td>#{{ ord.id }}</td>
+                            <td><strong>{{ ord.customer_name }}</strong></td>
+                            <td>
+                                {% for p in ord.products %}
+                                    <span class="product-tag">{{ p.name }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>{{ ord.products|length }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

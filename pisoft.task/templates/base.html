@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MegaStore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">🛍️ MegaStore</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/cart" class="cart-btn">Cart 🛒 <span>({{ session['cart']|length if 'cart' in session else 0 }})</span></a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        {% block content %} {% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; 2026 MegaStore. All rights reserved.</p>
+    </footer>
+</body>
+</html>
